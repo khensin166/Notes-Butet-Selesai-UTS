@@ -1,0 +1,347 @@
+<!--
+  Gift Web (Simple & Elegant) - Single-file HTML
+  Theme: Rose Gold & Cream
+
+  What this file includes:
+  - Landing section with "Buka Hadiahnya" button
+  - Video ucapan (placeholder: assets/video.mp4)
+  - Confetti effect when video ends or when "Buka Hadiah" clicked
+  - "Buka Hadiah" interactive reveal (note + certificate download)
+  - Gallery lightbox (images in assets/images/)
+  - Background music with mute/unmute
+  - Responsive & accessible, no frameworks
+
+  Files / assets to prepare before deploying:
+  - assets/video.mp4        -> your personal congratulation video
+  - assets/music.mp3        -> optional background music (short loop)
+  - assets/images/*         -> gallery images (foto1.jpg, foto2.jpg, ...)
+  - assets/thumbnail.jpg    -> poster image for video
+
+  Deployment:
+  - Put this file as index.html in a repo and enable GitHub Pages
+  - If you want custom domain, add CNAME file with your subdomain
+
+  Replace placeholder texts in HTML where needed.
+--> 
+
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Selamat! — Hadiah Spesial</title>
+  <meta name="description" content="Ucapan selamat personal" />
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #FFF8F0; /* cream lembut */
+      --accent: #E0BFB8; /* rose gold */
+      --text: #3A3A3A; /* abu tua */
+      --glass: rgba(255,255,255,0.6);
+      --card-shadow: 0 6px 22px rgba(58,58,58,0.08);
+      --max-width: 920px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: linear-gradient(135deg,var(--bg), #FFFDFB);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding:48px 16px;
+    }
+
+    .page{
+      width:100%;
+      max-width:var(--max-width);
+      background:transparent;
+      display:block;
+    }
+
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+    .brand{
+      display:flex;align-items:center;gap:12px;
+    }
+    .logo{
+      width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#f5dcd6);display:flex;align-items:center;justify-content:center;box-shadow:var(--card-shadow);
+      font-family:'Playfair Display';font-weight:600;color:#fff;font-size:20px
+    }
+    .brand h1{margin:0;font-family:'Playfair Display';font-size:20px;color:var(--text)}
+    .brand p{margin:0;font-size:13px;color:rgba(58,58,58,0.8)}
+
+    main{background:transparent}
+
+    .hero{
+      background:linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0.35));
+      padding:32px;border-radius:16px;box-shadow:var(--card-shadow);display:flex;gap:28px;align-items:center;flex-wrap:wrap;justify-content:space-between
+    }
+
+    .hero-left{flex:1;min-width:260px}
+    .hero-right{width:360px;max-width:45%;min-width:280px}
+
+    .title{font-family:'Playfair Display';font-size:28px;margin:0 0 8px}
+    .subtitle{margin:0;color:rgba(58,58,58,0.8)}
+
+    .cta{
+      margin-top:18px;display:flex;gap:12px;align-items:center
+    }
+    .btn{
+      background:var(--accent);border:none;padding:10px 16px;border-radius:10px;color:white;font-weight:600;cursor:pointer;box-shadow:0 6px 20px rgba(224,191,184,0.18);transition:transform .18s ease
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn-ghost{background:transparent;border:1px solid rgba(58,58,58,0.06);padding:10px;border-radius:10px}
+
+    /* video card */
+    .video-wrap{background:var(--glass);padding:12px;border-radius:12px;display:flex;flex-direction:column;align-items:center;gap:12px}
+    video{border-radius:8px;max-width:100%;height:auto;display:block;border:1px solid rgba(58,58,58,0.04)}
+    .controls{display:flex;gap:8px;align-items:center}
+
+    /* sections */
+    section{margin-top:18px}
+
+    /* gift reveal */
+    .gift-card{margin-top:18px;padding:18px;border-radius:12px;background:linear-gradient(180deg, #fff, #fff);box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:12px}
+    .gift-note{padding:14px;border-radius:10px;background:linear-gradient(180deg,#fff,#FEF8F6);border:1px solid rgba(224,191,184,0.3)}
+    .signature{font-style:italic;color:rgba(58,58,58,0.7)}
+
+    /* gallery */
+    .gallery{display:flex;gap:10px;flex-wrap:wrap}
+    .gallery img{height:80px;border-radius:8px;object-fit:cover;cursor:pointer;box-shadow:0 6px 18px rgba(58,58,58,0.06)}
+
+    /* note modal */
+    .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);opacity:0;pointer-events:none;transition:opacity .2s}
+    .modal.show{opacity:1;pointer-events:auto}
+    .modal-card{background:white;padding:22px;border-radius:14px;max-width:720px;width:92%;box-shadow:0 22px 60px rgba(58,58,58,0.18);}
+    .modal-card h2{margin:0 0 8px}
+    .modal-close{position:absolute;top:18px;right:18px;background:transparent;border:0;color:#fff;font-size:20px}
+
+    /* confetti canvas */
+    #confetti{position:fixed;left:0;top:0;pointer-events:none;width:100%;height:100%;z-index:40}
+
+    footer{margin-top:28px;text-align:center;color:rgba(58,58,58,0.6);font-size:13px}
+
+    /* responsive */
+    @media (max-width:800px){
+      .hero{padding:20px}
+      .hero-right{width:100%;max-width:none}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page" role="main">
+    <header>
+      <div class="brand">
+        <div class="logo">❤</div>
+        <div>
+          <h1>Untukmu</h1>
+          <p>Hadiah kecil dari Kenan</p>
+        </div>
+      </div>
+      <div>
+        <button id="muteBtn" class="btn-ghost">Mute</button>
+      </div>
+    </header>
+
+    <main>
+      <div class="hero">
+        <div class="hero-left">
+          <h2 class="title">Selamat! Kamu Lulus</h2>
+          <p class="subtitle">Aku tahu perjuanganmu nggak mudah. Ini hadiah kecil sebagai tanda aku bangga banget sama kamu.</p>
+
+          <div class="cta">
+            <button id="openGift" class="btn">Buka Hadiahnya 🎁</button>
+            <button id="scrollToVideo" class="btn-ghost">Lihat Pesanku</button>
+          </div>
+
+          <div class="gift-card" id="giftCard" aria-hidden="true" style="display:none">
+            <div class="gift-note" id="giftNote">
+              <p>💌 <strong>Surprise!</strong></p>
+              <p id="noteText">Ini catatan rahasiaku buat kamu. Ganti teks ini dengan pesanmu. Kamu bisa menambahkan kata-kata pribadi agar lebih berkesan.</p>
+              <p class="signature">– Dari Kenan</p>
+            </div>
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <a id="downloadCert" class="btn-ghost" href="#">Download Sertifikat</a>
+              <button id="openModal" class="btn-ghost">Lihat Foto Kita</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-right">
+          <div class="video-wrap">
+            <video id="greetingVideo" controls preload="metadata" poster="assets/thumbnail.jpg">
+              <source src="assets/video.mp4" type="video/mp4">
+              Browser kamu tidak mendukung video.
+            </video>
+            <div class="controls">
+              <button id="playBtn" class="btn-ghost">Play</button>
+              <button id="confettiBtn" class="btn">Rayakan 🎉</button>
+            </div>
+          </div>
+
+          <section>
+            <h3 style="margin:8px 0 6px">Galeri Kenangan</h3>
+            <div class="gallery" id="gallery">
+              <!-- add <img src="assets/images/foto1.jpg" alt="..."> items -->
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <section>
+        <h3 style="margin:12px 0">Pesan Penutup</h3>
+        <p style="max-width:760px">Kamu boleh istirahat sekarang. Aku percaya ini bukan akhir, tapi awal dari hal-hal indah berikutnya. Aku selalu ada di sampingmu.</p>
+      </section>
+
+      <footer>
+        Dibuat dengan ❤️ oleh Kenan — Untuk [Nama Pacar]
+      </footer>
+    </main>
+  </div>
+
+  <!-- confetti canvas -->
+  <canvas id="confetti"></canvas>
+
+  <!-- modal lightbox -->
+  <div class="modal" id="modal">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="modalClose">✕</button>
+      <h2 id="modalTitle">Galeri Foto</h2>
+      <div id="modalContent" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px"></div>
+    </div>
+  </div>
+
+  <!-- background audio -->
+  <audio id="bgAudio" loop>
+    <source src="assets/music.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+    // ---------- Simple confetti implementation ----------
+    (function(){
+      const canvas = document.getElementById('confetti');
+      const ctx = canvas.getContext('2d');
+      let W = canvas.width = window.innerWidth;
+      let H = canvas.height = window.innerHeight;
+      window.addEventListener('resize', () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; });
+
+      function random(min,max){ return Math.random()*(max-min)+min }
+      function Confetti(){
+        this.x = Math.random()*W; this.y = Math.random()*H - H; this.r = random(6,12);
+        this.d = (Math.random()*40)+10; this.color = `rgba(224,191,184,${random(0.9,1)})`; this.tilt = random(-10,10);
+        this.tiltAngle = 0; this.tiltAngleIncrement = random(0.05,0.12);
+      }
+      Confetti.prototype.draw = function(){ ctx.beginPath(); ctx.lineWidth = this.r/2; ctx.strokeStyle = this.color; ctx.moveTo(this.x+this.tilt+this.r/4, this.y); ctx.lineTo(this.x+this.tilt, this.y+this.r); ctx.stroke(); };
+
+      let confettis = [];
+      function startConfetti(){ confettis = []; for(let i=0;i<80;i++){ confettis.push(new Confetti()) } run(); setTimeout(stopConfetti, 4000); }
+      function stopConfetti(){ confettis = []; ctx.clearRect(0,0,W,H); cancelAnimationFrame(anim); }
+
+      let anim;
+      function run(){ ctx.clearRect(0,0,W,H); for(let i=0;i<confettis.length;i++){ let c=confettis[i]; c.tiltAngle += c.tiltAngleIncrement; c.y += (Math.cos(c.d)+3+ c.r/2)/2; c.x += Math.sin(c.tiltAngle); c.tilt = Math.sin(c.tiltAngle)*12; c.draw(); if(c.y>H){ confettis.splice(i,1); i--; } } anim = requestAnimationFrame(run); }
+
+      // expose
+      window.startConfetti = startConfetti;
+    })();
+
+    // ---------- DOM interactions ----------
+    const openGift = document.getElementById('openGift');
+    const giftCard = document.getElementById('giftCard');
+    const video = document.getElementById('greetingVideo');
+    const playBtn = document.getElementById('playBtn');
+    const confettiBtn = document.getElementById('confettiBtn');
+    const muteBtn = document.getElementById('muteBtn');
+    const bgAudio = document.getElementById('bgAudio');
+    const scrollToVideo = document.getElementById('scrollToVideo');
+    const modal = document.getElementById('modal');
+    const modalClose = document.getElementById('modalClose');
+    const openModal = document.getElementById('openModal');
+    const modalContent = document.getElementById('modalContent');
+    const gallery = document.getElementById('gallery');
+    const downloadCert = document.getElementById('downloadCert');
+
+    // show/hide gift
+    openGift.addEventListener('click', ()=>{
+      giftCard.style.display = giftCard.style.display === 'none' ? 'block' : 'block';
+      giftCard.setAttribute('aria-hidden','false');
+      // start confetti
+      if(window.startConfetti) startConfetti();
+    });
+
+    // play video controls
+    playBtn.addEventListener('click', ()=>{ if(video.paused){ video.play(); playBtn.textContent='Pause' } else { video.pause(); playBtn.textContent='Play' } });
+    confettiBtn.addEventListener('click', ()=>{ if(window.startConfetti) startConfetti(); });
+
+    // when video ends -> confetti
+    video.addEventListener('ended', ()=>{ if(window.startConfetti) startConfetti(); });
+
+    // background audio mute/unmute
+    muteBtn.addEventListener('click', ()=>{
+      if(bgAudio.paused){ bgAudio.play(); muteBtn.textContent='Mute'; } else { bgAudio.pause(); muteBtn.textContent='Play Music'; }
+    });
+
+    // scroll to video
+    scrollToVideo.addEventListener('click', ()=>{ video.scrollIntoView({behavior:'smooth',block:'center'}) });
+
+    // modal gallery
+    openModal.addEventListener('click', ()=>{ modal.classList.add('show'); document.body.style.overflow='hidden' });
+    modalClose.addEventListener('click', ()=>{ modal.classList.remove('show'); document.body.style.overflow='' });
+    modal.addEventListener('click', (e)=>{ if(e.target===modal){ modal.classList.remove('show'); document.body.style.overflow='' } });
+
+    // load gallery (auto-scan assets/images/foto1..N)
+    const IMAGES = [
+      'assets/images/foto1.jpg',
+      'assets/images/foto2.jpg',
+      'assets/images/foto3.jpg'
+    ];
+
+    function populateGallery(){
+      IMAGES.forEach(src=>{
+        const img = document.createElement('img'); img.src = src; img.alt = 'Kenangan';
+        img.addEventListener('click', ()=>{ openLightbox(src) });
+        gallery.appendChild(img);
+
+        const clone = img.cloneNode();
+        clone.style.height='120px';
+        modalContent.appendChild(clone);
+      });
+    }
+    populateGallery();
+
+    function openLightbox(src){
+      // simple lightbox using modal
+      modal.classList.add('show'); modalContent.innerHTML = '';
+      const big = document.createElement('img'); big.src = src; big.style.width='100%'; big.style.borderRadius='8px';
+      modalContent.appendChild(big);
+      document.body.style.overflow='hidden';
+    }
+
+    // download certificate placeholder (we create a small data URL pdf-like image)
+    downloadCert.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const certHTML = `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675'><rect width='100%' height='100%' fill='#FFF8F0'/><text x='50%' y='35%' dominant-baseline='middle' text-anchor='middle' font-size='40' fill='#3A3A3A' font-family='Playfair Display'>SERTIFIKAT PENGHARGAAN</text><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='28' fill='#3A3A3A' font-family='Inter'>Diberikan kepada</text><text x='50%' y='60%' dominant-baseline='middle' text-anchor='middle' font-size='34' fill='#3A3A3A' font-family='Playfair Display'>[Nama Pacar]</text></svg>`;
+      const blob = new Blob([certHTML], {type: 'image/svg+xml'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'sertifikat.svg'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    // small accessibility: keyboard close
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') modal.classList.remove('show') });
+
+    // autoplay background music on user gesture: some browsers block autoplay; we rely on user clicking muteBtn or play
+    // if you want music to start automatically uncomment next line after user interaction
+    // bgAudio.play().catch(()=>{})
+
+  </script>
+</body>
+</html>
